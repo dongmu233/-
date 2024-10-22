@@ -108,9 +108,9 @@
 
             const targetTotal = targetDaily * 365;
             const currentTotal = currentDaily * currentTime;
-            const targetPoint = (targetTotal - currentTotal) / saveTime;
+            const targetPoint = (targetDaily * 365 - currentDaily * currentTime - saveTime * currentPoint) / saveTime;
             const saveAmount = targetPoint - currentPoint;
-
+        }
             // 保留两位小数
             document.getElementById("targetTotal").innerText = targetTotal.toFixed(2);
             document.getElementById("currentTotal").innerText = currentTotal.toFixed(2);
