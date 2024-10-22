@@ -51,7 +51,7 @@
             background-color: #0056b3;
         }
 
-      .result {
+     .result {
             width: 400px;
             margin: 20px auto;
             padding: 20px;
@@ -110,7 +110,7 @@
             const currentTotal = currentDaily * currentTime;
             const targetPoint = (targetDaily * 365 - currentDaily * currentTime - saveTime * currentPoint) / saveTime;
             const saveAmount = targetPoint - currentPoint;
-        }
+
             // 保留两位小数
             document.getElementById("targetTotal").innerText = targetTotal.toFixed(2);
             document.getElementById("currentTotal").innerText = currentTotal.toFixed(2);
