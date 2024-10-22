@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device - width, initial - scale = 1.0">
+    <title>年日均计算小程序--栖霞公司部</title>
+    <style>
+        /* 整体页面布局样式 */
+        body {
+            font-family: Arial, sans - serif;
+            line - height: 1.6;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            width: 400px;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border - radius: 5px;
+        }
+
+        label {
+            display: block;
+            margin - bottom: 5px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin - bottom: 15px;
+            box - sizing: border - box;
+            border: 1px solid #ccc;
+            border - radius: 3px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+      .result {
+            width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border - radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>年日均计算小程序--栖霞公司部</h1>
+    <form>
+        <label for="currentDaily">当前日均（万元）:</label>
+        <input type="number" id="currentDaily" name="currentDaily">
+        <label for="currentPoint">当前时点（万元）:</label>
+        <input type="number" id="currentPoint" name="currentPoint">
+        <label for="currentTime">当前时间(本年天数):</label>
+        <input type="text" id="currentTime" name="currentTime" readonly>
+        <label for="targetDaily">目标日均（万元）:</label>
+        <input type="number" id="targetDaily" name="targetDaily">
+        <label for="saveTime">留钱时间(天):</label>
+        <input type="number" id="saveTime" name="saveTime">
+        <button type="button" onclick="calculate()">计算留钱金额</button>
+    </form>
+    <div class="result">
+        <h2>结果:</h2>
+        <!-- 隐藏目标合计 -->
+        <p style="display:none;">目标合计: <span id="targetTotal"></span></p>
+        <!-- 隐藏目前合计 -->
+        <p style="display:none;">目前合计: <span id="currentTotal"></span></p>
+        <p>目标时点（万元）: <span id="targetPoint"></span></p>
+        <p>净增金额（万元）: <span id="saveAmount"></span></p>
+    </div>
+
+    <script>
+        // 更新当前时间字段，显示本年已过天数
+        document.getElementById("currentTime").value = getDaysInYear();
+
+        function getDaysInYear() {
+            const now = new Date();
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+            const diff = now - startOfYear;
+            const oneDay = 1000 * 60 * 60 * 24;
+            return Math.ceil(diff / oneDay);
+        }
+
+        function calculate() {
+            const currentDaily = parseFloat(document.getElementById("currentDaily").value);
+            const currentPoint = parseFloat(document.getElementById("currentPoint").value);
+            const currentTime = parseFloat(document.getElementById("currentTime").value);
+            const targetDaily = parseFloat(document.getElementById("targetDaily").value);
+            const saveTime = parseFloat(document.getElementById("saveTime").value);
+
+            const targetTotal = targetDaily * 365;
+            const currentTotal = currentDaily * currentTime;
+            const targetPoint = (targetTotal - currentTotal) / saveTime;
+            const saveAmount = targetPoint - currentPoint;
+
+            // 保留两位小数
+            document.getElementById("targetTotal").innerText = targetTotal.toFixed(2);
+            document.getElementById("currentTotal").innerText = currentTotal.toFixed(2);
+            document.getElementById("targetPoint").innerText = targetPoint.toFixed(2);
+            document.getElementById("saveAmount").innerText = saveAmount.toFixed(2);
+        }
+    </script>
+</body>
+
+</html>
