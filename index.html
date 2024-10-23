@@ -1,123 +1,167 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device - width, initial - scale = 1.0">
-    <title>年日均计算小程序--栖霞公司部</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日均计算器--栖霞公司部</title>
     <style>
-        /* 整体页面布局样式 */
         body {
-            font-family: Arial, sans - serif;
-            line - height: 1.6;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
         }
-
-        h1,
         h2 {
             text-align: center;
+            color: #333;
         }
-
-        form {
-            width: 400px;
-            margin: 0 auto;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border - radius: 5px;
-        }
-
-        label {
-            display: block;
-            margin - bottom: 5px;
-        }
-
-        input,
-        button {
+        table {
             width: 100%;
-            padding: 10px;
-            margin - bottom: 15px;
-            box - sizing: border - box;
-            border: 1px solid #ccc;
-            border - radius: 3px;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
         }
-
-        button {
-            background-color: #007BFF;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #4CAF50;
             color: white;
-            cursor: pointer;
         }
-
-        button:hover {
-            background-color: #0056b3;
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
         }
-
-     .result {
-            width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #f9f9f9;
+        tr:hover {
+            background-color: #ddd;
+        }
+        input[type="number"] {
+            width: 80%;
+            padding: 8px;
             border: 1px solid #ccc;
-            border - radius: 5px;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        @media (max-width: 600px) {
+            th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
+            input[type="number"] {
+                width: 100%;
+            }
         }
     </style>
 </head>
-
 <body>
-    <h1>年日均计算小程序--栖霞公司部</h1>
-    <form>
-        <label for="currentDaily">当前日均（万元）:</label>
-        <input type="number" id="currentDaily" name="currentDaily">
-        <label for="currentPoint">当前时点（万元）:</label>
-        <input type="number" id="currentPoint" name="currentPoint">
-        <label for="currentTime">当前时间(本年天数):</label>
-        <input type="text" id="currentTime" name="currentTime" readonly>
-        <label for="targetDaily">目标日均（万元）:</label>
-        <input type="number" id="targetDaily" name="targetDaily">
-        <label for="saveTime">留钱时间(天):</label>
-        <input type="number" id="saveTime" name="saveTime">
-        <button type="button" onclick="calculate()">计算净增金额</button>
-    </form>
-    <div class="result">
-        <h2>结果:</h2>
-        <!-- 隐藏目标合计 -->
-        <p style="display:none;">目标合计: <span id="targetTotal"></span></p>
-        <!-- 隐藏目前合计 -->
-        <p style="display:none;">目前合计: <span id="currentTotal"></span></p>
-        <p>目标时点（万元）: <span id="targetPoint"></span></p>
-        <p>净增金额（万元）: <span id="saveAmount"></span></p>
-    </div>
 
-    <script>
-        // 更新当前时间字段，显示本年已过天数
-        document.getElementById("currentTime").value = getDaysInYear();
+<h2>日均计算器--栖霞公司部</h2>
+<table>
+    <tr>
+        <th>项目</th>
+        <th>值</th>
+    </tr>
+    <tr>
+        <td>日均</td>
+        <td><input type="number" id="dailyAverage" onchange="calculate()"></td>
+    </tr>
+    <tr>
+        <td>时点</td>
+        <td><input type="number" id="timePoint" onchange="calculate()"></td>
+    </tr>
+    <tr>
+        <td>基准线</td>
+        <td><input type="number" id="baseline" onchange="calculate()"></td>
+    </tr>
+    <tr>
+        <td>今日日期</td>
+        <td id="currentDate"></td>
+    </tr>
+    <tr>
+        <td>本年已过天数</td>
+        <td id="daysPassedYear"></td>
+    </tr>
+    <tr>
+        <td>本年剩余天数</td>
+        <td id="daysRemainingYear"></td>
+    </tr>
+    <tr>
+        <td>本月已过天数</td>
+        <td id="daysPassedMonth"></td>
+    </tr>
+    <tr>
+        <td>本月剩余天数</td>
+        <td id="daysRemainingMonth"></td>
+    </tr>
+    <tr>
+        <td>本年达基准线需存入金额</td>
+        <td id="amountToDepositYear"></td>
+    </tr>
+    <tr>
+        <td>本月达基准线需存入金额</td>
+        <td id="amountToDepositMonth"></td>
+    </tr>
+    <tr>
+        <td>本月确定达标</td>
+        <td id="monthlyTarget"></td>
+    </tr>
+    <tr>
+        <td>本年确定达标</td>
+        <td id="yearlyTarget"></td>
+    </tr>
+</table>
 
-        function getDaysInYear() {
-            const now = new Date();
-            const startOfYear = new Date(now.getFullYear(), 0, 1);
-            const diff = now - startOfYear;
-            const oneDay = 1000 * 60 * 60 * 24;
-            return Math.ceil(diff / oneDay);
-        }
+<script>
+    function calculate() {
+        const dailyAverage = parseFloat(document.getElementById('dailyAverage').value) || 0;
+        const timePoint = parseFloat(document.getElementById('timePoint').value) || 0;
+        const baseline = parseFloat(document.getElementById('baseline').value) || 0;
 
-        function calculate() {
-            const currentDaily = parseFloat(document.getElementById("currentDaily").value);
-            const currentPoint = parseFloat(document.getElementById("currentPoint").value);
-            const currentTime = parseFloat(document.getElementById("currentTime").value);
-            const targetDaily = parseFloat(document.getElementById("targetDaily").value);
-            const saveTime = parseFloat(document.getElementById("saveTime").value);
+        const today = new Date();
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        
+        const daysPassedYear = Math.floor((today - startOfYear) / (1000 * 60 * 60 * 24));
+        const daysRemainingYear = 365 - daysPassedYear;
+        const daysPassedMonth = Math.floor((today - startOfMonth) / (1000 * 60 * 60 * 24));
+        const daysRemainingMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate() - daysPassedMonth;
 
-            const targetTotal = targetDaily * 365;
-            const currentTotal = currentDaily * currentTime;
-            const targetPoint = (targetDaily * 365 - currentDaily * currentTime - saveTime * currentPoint) / saveTime;
-            const saveAmount = targetPoint - currentPoint;
+        document.getElementById('currentDate').innerText = today.toLocaleDateString();
+        document.getElementById('daysPassedYear').innerText = daysPassedYear;
+        document.getElementById('daysRemainingYear').innerText = daysRemainingYear;
+        document.getElementById('daysPassedMonth').innerText = daysPassedMonth;
+        document.getElementById('daysRemainingMonth').innerText = daysRemainingMonth;
 
-            // 保留两位小数
-            document.getElementById("targetTotal").innerText = targetTotal.toFixed(2);
-            document.getElementById("currentTotal").innerText = currentTotal.toFixed(2);
-            document.getElementById("targetPoint").innerText = targetPoint.toFixed(2);
-            document.getElementById("saveAmount").innerText = saveAmount.toFixed(2);
-        }
-    </script>
+        const amountToDepositYear = (baseline * (daysPassedYear + daysRemainingYear) - dailyAverage * daysPassedYear - timePoint * daysRemainingYear) / daysRemainingYear;
+        const amountToDepositMonth = (baseline * (daysPassedYear + daysRemainingMonth) - dailyAverage * daysPassedYear - timePoint * daysRemainingMonth) / daysRemainingMonth;
+
+        document.getElementById('amountToDepositYear').innerText = amountToDepositYear.toFixed(2);
+        document.getElementById('amountToDepositMonth').innerText = amountToDepositMonth.toFixed(2);
+
+        const monthlyTarget = ((daysPassedYear + daysRemainingMonth) * baseline) / daysPassedYear;
+        const yearlyTarget = ((daysPassedYear + daysRemainingYear) * baseline) / daysPassedYear;
+
+        document.getElementById('monthlyTarget').innerText = monthlyTarget.toFixed(2);
+        document.getElementById('yearlyTarget').innerText = yearlyTarget.toFixed(2);
+    }
+
+    // 初始化日期和天数
+    window.onload = function() {
+        const today = new Date();
+        document.getElementById('currentDate').innerText = today.toLocaleDateString();
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        const daysPassedYear = Math.floor((today - startOfYear) / (1000 * 60 * 60 * 24));
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const daysPassedMonth = Math.floor((today - startOfMonth) / (1000 * 60 * 60 * 24));
+        const daysRemainingMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate() - daysPassedMonth;
+
+        document.getElementById('daysPassedYear').innerText = daysPassedYear;
+        document.getElementById('daysRemainingYear').innerText = 365 - daysPassedYear;
+        document.getElementById('daysPassedMonth').innerText = daysPassedMonth;
+        document.getElementById('daysRemainingMonth').innerText = daysRemainingMonth;
+    };
+</script>
+
 </body>
-
 </html>
