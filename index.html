@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>日均计算器--栖霞公司部</title>
+    <title>日均计算器</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -139,8 +139,9 @@
         document.getElementById('amountToDepositYear').innerText = amountToDepositYear.toFixed(2);
         document.getElementById('amountToDepositMonth').innerText = amountToDepositMonth.toFixed(2);
 
-        const monthlyTarget = ((daysPassedYear + daysRemainingMonth) * baseline) / daysPassedYear;
-        const yearlyTarget = ((daysPassedYear + daysRemainingYear) * baseline) / daysPassedYear;
+        // 更新本月确定达标和本年确定达标的计算公式
+        const monthlyTarget = (dailyAverage * daysPassedYear + timePoint * daysRemainingMonth) / (daysPassedYear + daysRemainingMonth);
+        const yearlyTarget = (dailyAverage * daysPassedYear + timePoint * daysRemainingYear) / (daysPassedYear + daysRemainingYear);
 
         document.getElementById('monthlyTarget').innerText = monthlyTarget.toFixed(2);
         document.getElementById('yearlyTarget').innerText = yearlyTarget.toFixed(2);
